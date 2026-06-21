@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; }
+    @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+    @keyframes pop{ 0%{ transform:scale(0.4); opacity:0; } 60%{ transform:scale(1.12); } 100%{ transform:scale(1); opacity:1; } }
+    @keyframes blkbounce{ 0%,100%{ transform:translateY(0); } 30%{ transform:translateY(-12px); } 55%{ transform:translateY(0); } 70%{ transform:translateY(-5px); } }
+    @keyframes starpop{ 0%{ transform:scale(0) rotate(-40deg); opacity:0; } 70%{ transform:scale(1.3) rotate(8deg); } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; width:100%; padding:30px 18px 46px; background:linear-gradient(180deg,#FFF1F6 0%,#FFF6E9 55%,#EAF7FF 100%); font-family:'Baloo 2','Noto Sans TC',sans-serif; position:relative; overflow:hidden;">
+
+  <div style="position:absolute; top:-60px; left:-40px; width:240px; height:240px; border-radius:50%; background:#FFD6E5; opacity:.5; filter:blur(8px);"></div>
+  <div style="position:absolute; bottom:-70px; right:-50px; width:300px; height:300px; border-radius:50%; background:#CDEAFF; opacity:.55; filter:blur(8px);"></div>
+  <div style="position:absolute; top:46px; right:64px; width:64px; height:64px; border-radius:50%; background:#FFE38A; box-shadow:0 0 0 13px rgba(255,227,138,.32); animation:floaty 5s ease-in-out infinite;"></div>
+  <div style="position:absolute; top:150px; left:46px; width:86px; height:32px; border-radius:20px; background:#fff; opacity:.8; animation:floaty 7s ease-in-out infinite;"></div>
+
+  <div style="max-width:1060px; margin:0 auto; background:#FFFDFB; border:3px solid #FFE9DE; border-radius:40px; padding:28px 32px 32px; box-shadow:0 30px 60px -28px rgba(120,80,60,.35); position:relative; z-index:2;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
+      <div>
+        <div style="font-size:33px; font-weight:800; color:#5B4A42; line-height:1;">小小時鐘學堂 <span style="color:#FF8A3D;">🕐</span></div>
+        <div style="font-size:17px; font-weight:600; color:#B59A8C; margin-top:4px;">Learn the Clock · 看時鐘真好玩</div>
+      </div>
+      <div style="display:flex; gap:8px; background:#FFF0E6; padding:6px; border-radius:999px;">
+        <button onClick="{{ goFree }}" style="{{ freeTabStyle }}">🎨 自由玩</button>
+        <button onClick="{{ goQuiz }}" style="{{ quizTabStyle }}">⭐ 考考你</button>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:32px; align-items:flex-start; flex-wrap:wrap; justify-content:center;">
+
+      <!-- clock -->
+      <div style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:13px;">
+        <div ref="{{ clockRef }}" onPointerDown="{{ onDown }}" onPointerMove="{{ onMove }}" onPointerUp="{{ onUp }}" style="position:relative; width:336px; height:336px; border-radius:50%; background:radial-gradient(circle at 50% 38%,#FFFFFF 0%,#FFF7F2 70%,#FFF0E8 100%); border:11px solid #FFD9C7; box-shadow:0 16px 30px -14px rgba(180,120,90,.5), inset 0 0 0 6px #FFF6F0; touch-action:none; cursor:grab; user-select:none;">
+          <div style="position:absolute; inset:24px; border-radius:50%; border:2px dashed #FFE0D2;"></div>
+
+          <sc-for list="{{ clockNums }}" as="num" hint-placeholder-count="12">
+            <div style="position:absolute; left:0; top:0; width:46px; height:46px; transform:translate({{ num.x }}px,{{ num.y }}px); display:flex; align-items:center; justify-content:center; font-size:29px; font-weight:800; color:{{ num.color }};">{{ num.label }}</div>
+          </sc-for>
+
+          <div style="{{ hourHandStyle }}"></div>
+          <div style="{{ minuteHandStyle }}"></div>
+          <div style="position:absolute; left:50%; top:50%; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%; background:#FFB347; border:4px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.2); z-index:8;"></div>
+        </div>
+
+        <div style="font-size:15px; font-weight:700; color:#B59A8C; text-align:center;">用手指轉動<span style="color:#3FA7D6;"> 藍色長針 </span>· Drag the blue hand</div>
+
+        <div style="display:flex; gap:18px; align-items:center; font-size:13px; font-weight:700; color:#7A6A60;">
+          <div style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block; width:28px; height:9px; border-radius:6px; background:#FF7A59;"></span>短針·時 Hour</div>
+          <div style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block; width:40px; height:9px; border-radius:6px; background:#3FA7D6;"></span>長針·分 Min</div>
+        </div>
+      </div>
+
+      <!-- right -->
+      <div style="flex:1 1 360px; min-width:320px; display:flex; flex-direction:column; gap:16px;">
+
+        <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF; border:3px solid #FFC9DD; border-radius:24px; padding:16px 20px; box-shadow:0 12px 24px -16px rgba(255,120,160,.6);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-size:16px; font-weight:800; color:#D84B7E;">⭐ 小挑戰 Challenge</div>
+            <div style="font-size:14px; font-weight:800; color:#E59A2B; background:#FFF4DE; padding:4px 12px; border-radius:999px;">收集 {{ stars }} ⭐</div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; background:#FFF7FB; border-radius:16px; padding:8px 12px; margin-bottom:10px;">
+            <span style="font-size:14px; font-weight:800; color:#B07089;">難度 Level</span>
+            <div style="display:flex; gap:6px;">
+              <sc-for list="{{ levelDots }}" as="dot" hint-placeholder-count="3">
+                <button onClick="{{ dot.onClick }}" style="width:38px; height:38px; border:none; border-radius:12px; cursor:pointer; font-size:20px; font-family:inherit; background:{{ dot.bg }}; box-shadow:{{ dot.shadow }};">{{ dot.icon }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#FFF0F5; border-radius:18px; padding:13px 16px; text-align:center;">
+            <div style="font-size:14px; font-weight:700; color:#B07089;">請把時鐘轉到 · Set the clock to</div>
+            <div style="font-size:36px; font-weight:800; color:#D84B7E; line-height:1.15;">{{ targetCN }}</div>
+            <div style="font-size:19px; font-weight:700; color:#E08FB0;">{{ targetDigital }}</div>
+          </div>
+          <div style="min-height:28px; text-align:center; margin:9px 0 3px; font-size:19px; font-weight:800; color:{{ quizMsgColor }};">{{ quizMsg }}</div>
+          <div style="display:flex; gap:10px;">
+            <button onClick="{{ checkQuiz }}" style="flex:1; padding:13px; border:none; border-radius:16px; background:#FF7AAB; color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 6px 0 #E05B8F;">✓ 檢查 Check</button>
+            <button onClick="{{ newQuiz }}" style="flex:0 0 auto; padding:13px 18px; border:none; border-radius:16px; background:#FFE0EC; color:#D84B7E; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer;">↻ 換一題</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <div style="background:linear-gradient(135deg,#5B4A42,#7A6253); border-radius:28px; padding:20px 24px; color:#fff; box-shadow:0 12px 24px -12px rgba(90,74,66,.6); display:flex; align-items:center; justify-content:space-between; gap:14px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; letter-spacing:2px; color:#FFD9C7;">現在時間 · NOW</div>
+            <div style="font-size:62px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums;">{{ digital }}</div>
+          </div>
+          <button onClick="{{ togglePeriod }}" style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:1px; background:rgba(255,255,255,.16); border:none; border-radius:20px; padding:11px 15px; cursor:pointer; font-family:inherit;">
+            <span style="font-size:28px;">{{ periodIcon }}</span>
+            <span style="font-size:19px; font-weight:800; color:#fff;">{{ periodCN }}</span>
+            <span style="font-size:11px; font-weight:700; color:#FFD9C7;">{{ periodEN }} ⇆</span>
+          </button>
+        </div>
+
+        <div style="background:#FFF4DE; border:2px dashed #FFD98A; border-radius:24px; padding:15px 20px;">
+          <div style="font-size:23px; font-weight:800; color:#8A6D2F;">{{ sentenceCN }}</div>
+          <div style="font-size:15px; font-weight:700; color:#B89A55; margin-top:3px;">{{ sentenceEN }}</div>
+        </div>
+
+        <div style="background:#F3FAFF; border:2px solid #DCEEFB; border-radius:24px; padding:15px 18px;">
+          <div style="font-size:14px; font-weight:800; color:#5B7A93; margin-bottom:10px;">時針指著 <span style="color:#FF7A59; font-size:20px;">{{ hourNum }}</span> ，就是 {{ hourNum }} 塊積木！Hour = {{ hourNum }} blocks</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:flex-end; min-height:40px;">
+            <sc-for list="{{ hourBlocks }}" as="block" hint-placeholder-count="6">
+              <div style="position:relative; width:37px; height:37px; border-radius:9px; background:{{ block.color }}; box-shadow:inset 0 -5px 0 rgba(0,0,0,.16), 0 3px 5px rgba(0,0,0,.12); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:16px;">
+                {{ block.n }}
+                <sc-if value="{{ block.isFace }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:9px; left:8px; width:5px; height:5px; border-radius:50%; background:#3a2a22;"></div>
+                  <div style="position:absolute; top:9px; right:8px; width:5px; height:5px; border-radius:50%; background:#3a2a22;"></div>
+                  <div style="position:absolute; bottom:7px; left:50%; width:12px; height:6px; margin-left:-6px; border-radius:0 0 9px 9px; border:2px solid #3a2a22; border-top:none;"></div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- controls -->
+    <div style="margin-top:24px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center;">
+      <div style="display:flex; align-items:center; gap:10px; background:#FFF1E8; border-radius:22px; padding:11px 16px;">
+        <span style="font-size:18px; font-weight:800; color:#FF7A59; min-width:62px; text-align:center;">時 Hour</span>
+        <button onClick="{{ hourDown }}" style="width:50px; height:50px; border:none; border-radius:15px; background:#FFD9C7; color:#B5482A; font-size:28px; font-weight:800; cursor:pointer; font-family:inherit;">−</button>
+        <button onClick="{{ hourUp }}" style="width:50px; height:50px; border:none; border-radius:15px; background:#FF9E7A; color:#fff; font-size:28px; font-weight:800; cursor:pointer; font-family:inherit;">＋</button>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; background:#E9F6FF; border-radius:22px; padding:11px 16px;">
+        <span style="font-size:18px; font-weight:800; color:#3FA7D6; min-width:62px; text-align:center;">分 Min</span>
+        <button onClick="{{ minDown }}" style="width:50px; height:50px; border:none; border-radius:15px; background:#C7E8FB; color:#1E6E96; font-size:28px; font-weight:800; cursor:pointer; font-family:inherit;">−</button>
+        <button onClick="{{ minUp }}" style="width:50px; height:50px; border:none; border-radius:15px; background:#5BBDEA; color:#fff; font-size:28px; font-weight:800; cursor:pointer; font-family:inherit;">＋</button>
+      </div>
+      <button onClick="{{ resetClock }}" style="display:flex; align-items:center; gap:8px; background:#EFEAFE; border:none; border-radius:22px; padding:11px 22px; color:#6B4FB8; font-size:18px; font-weight:800; cursor:pointer; font-family:inherit;">↻ 重設 Reset</button>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    totalMin: 10 * 60 + 10, // minutes since 12:00, range 0..719
+    isPM: false,
+    mode: 'free',
+    target: 195,
+    level: 1,
+    stars: 0,
+    quizMsg: '',
+    quizOk: false,
+    dragging: false,
+  };
+
+  clockRef = (el) => { this._clock = el; };
+
+  norm(m){ return ((m % 720) + 720) % 720; }
+
+  setTotal(m){ this.setState({ totalMin: this.norm(m) }); }
+
+  // ---- pointer drag on minute hand ----
+  angleFromEvent(e){
+    const r = this._clock.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    let ang = Math.atan2(e.clientY - cy, e.clientX - cx) * 180/Math.PI + 90;
+    return (ang + 360) % 360; // 0 at top, clockwise
+  }
+  onDown = (e) => {
+    // record where the finger grabbed — do NOT jump the hand to the click point
+    this._lastPointerAng = this.angleFromEvent(e);
+    this.setState({ dragging: true });
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch(_){}
+  };
+  onMove = (e) => { if(this.state.dragging) this.dragTo(e); };
+  onUp = () => { this.setState({ dragging: false }); };
+  dragTo(e){
+    const ang = this.angleFromEvent(e);
+    // apply only the rotation the finger travelled, in minutes
+    let deltaDeg = ang - this._lastPointerAng;
+    if (deltaDeg > 180) deltaDeg -= 360;
+    if (deltaDeg < -180) deltaDeg += 360;
+    // accumulate fractional rotation, commit only whole minutes (keeps display clean)
+    this._accum = (this._accum || 0) + deltaDeg / 6;
+    const step = Math.trunc(this._accum);
+    this._lastPointerAng = ang;
+    if (step !== 0){
+      this._accum -= step;
+      this.setState({ totalMin: this.norm(this.state.totalMin + step) });
+    }
+  }
+
+  hourUp = () => this.setTotal(this.state.totalMin + 60);
+  hourDown = () => this.setTotal(this.state.totalMin - 60);
+  minUp = () => this.setTotal(this.state.totalMin + 1);
+  minDown = () => this.setTotal(this.state.totalMin - 1);
+  resetClock = () => this.setState({ totalMin: 0 });
+  togglePeriod = () => this.setState({ isPM: !this.state.isPM });
+
+  goFree = () => this.setState({ mode: 'free', quizMsg: '' });
+  goQuiz = () => { this.setState({ mode: 'quiz', quizMsg: '' }); this.makeTarget(); };
+  // ---- sound effects (Web Audio, no files) ----
+  audioCtx(){
+    if (!this._ac){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this._ac = new AC();
+    }
+    if (this._ac && this._ac.state === 'suspended') this._ac.resume();
+    return this._ac;
+  }
+  beep(freq, start, dur, type, vol){
+    const ac = this._ac; if (!ac) return;
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, ac.currentTime + start);
+    g.gain.setValueAtTime(0.0001, ac.currentTime + start);
+    g.gain.exponentialRampToValueAtTime(vol || 0.2, ac.currentTime + start + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + start + dur);
+    o.connect(g); g.connect(ac.destination);
+    o.start(ac.currentTime + start);
+    o.stop(ac.currentTime + start + dur + 0.05);
+  }
+  playCorrect(){
+    if (!this.audioCtx()) return;
+    // happy ascending arpeggio C-E-G-C
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => this.beep(f, i*0.11, 0.18, 'triangle', 0.25));
+  }
+  playWrong(){
+    if (!this.audioCtx()) return;
+    // gentle low "uh-oh" two-note descend
+    this.beep(311.13, 0, 0.22, 'sine', 0.22);
+    this.beep(233.08, 0.18, 0.3, 'sine', 0.22);
+  }
+
+  setLevel = (lv) => { this.setState({ level: lv }, () => this.makeTarget()); };
+  makeTarget = () => {
+    // level 1: 整點 only · level 2: + 半/15/45 · level 3: 任意 5 分
+    let mins;
+    if (this.state.level === 1) mins = [0];
+    else if (this.state.level === 2) mins = [0, 15, 30, 45];
+    else mins = [0,5,10,15,20,25,30,35,40,45,50,55];
+    const choices = [];
+    for (let h=1; h<=12; h++){ for (const mm of mins){ choices.push((h*60 + mm) % 720); } }
+    let t = choices[Math.floor(Math.random()*choices.length)];
+    if (this.norm(t) === this.norm(this.state.target)) t = choices[Math.floor(Math.random()*choices.length)];
+    this.setState({ target: t, quizMsg: '', quizOk: false });
+  };
+  newQuiz = () => this.makeTarget();
+  checkQuiz = () => {
+    if (this.norm(this.state.totalMin) === this.norm(this.state.target)){
+      this.playCorrect();
+      this.setState({ quizMsg: '🎉 答對了！太棒了！', quizOk: true, stars: this.state.stars + 1 });
+      setTimeout(() => { this.makeTarget(); }, 1600);
+    } else {
+      this.playWrong();
+      this.setState({ quizMsg: '再試試看～加油！', quizOk: false });
+    }
+  };
+
+  fmtTime(total){
+    const t = this.norm(total);
+    let h = Math.floor(t / 60);
+    const m = t % 60;
+    let h12 = h % 12; if (h12 === 0) h12 = 12;
+    return { h12, m, mm: String(m).padStart(2,'0') };
+  }
+
+  oclockWord(m){
+    if (m === 0) return { cn:'整', en:"o'clock" };
+    if (m === 15) return { cn:'15分', en:'fifteen' };
+    if (m === 30) return { cn:'30分（半）', en:'thirty' };
+    if (m === 45) return { cn:'45分', en:'forty-five' };
+    return null;
+  }
+
+  renderVals(){
+    const { h12, m, mm } = this.fmtTime(this.state.totalMin);
+    const minAngle = m * 6;
+    const hourAngle = (this.norm(this.state.totalMin) / 720) * 360;
+
+    // children are positioned in the padding box (inside the 11px border) = 314px, center 157,157
+    const numColors = ['#FF5A5A','#FF8A3D','#F2B705','#4FB85A','#2FA7D6','#5667D8','#9B59D0','#FF6FA5','#18B89C','#EE6C4D','#7CB518','#4357C7'];
+    const clockNums = [];
+    for (let i=1; i<=12; i++){
+      const a = (i*30) * Math.PI/180;
+      const x = 157 + 128*Math.sin(a) - 23;
+      const y = 157 - 128*Math.cos(a) - 23;
+      clockNums.push({ label:String(i), x:Math.round(x), y:Math.round(y), color:numColors[i-1] });
+    }
+
+    const handBase = 'position:absolute; left:50%; top:50%; transform-origin:50% 100%; border-radius:8px; z-index:';
+
+    const hourHandStyle = handBase + '6; width:14px; height:88px; margin-left:-7px; margin-top:-88px; background:linear-gradient(#FF8A5B,#FF6B3D); box-shadow:0 2px 6px rgba(200,90,50,.4); transform:rotate(' + hourAngle + 'deg);' + (this.state.dragging ? '' : ' transition:transform .25s cubic-bezier(.34,1.56,.64,1);');
+    const minuteHandStyle = handBase + '7; width:11px; height:128px; margin-left:-5.5px; margin-top:-128px; background:linear-gradient(#5BC2EE,#2F9FD6); box-shadow:0 2px 7px rgba(40,120,170,.45); transform:rotate(' + minAngle + 'deg);' + (this.state.dragging ? '' : ' transition:transform .25s cubic-bezier(.34,1.56,.64,1);');
+
+    // digital
+    const digital = h12 + ':' + mm;
+
+    // sentence
+    const ow = this.oclockWord(m);
+    let sentenceCN, sentenceEN;
+    if (ow){
+      sentenceCN = '現在是 ' + h12 + ' 點' + (m===0 ? '整' : (' ' + (m===30 ? '半' : (m + '分'))));
+      sentenceEN = (m===0) ? ("It's " + h12 + " o'clock.") : ("It's " + h12 + ":" + mm + ".");
+    } else {
+      sentenceCN = '現在是 ' + h12 + ' 點 ' + m + ' 分';
+      sentenceEN = "It's " + h12 + ":" + mm + ".";
+    }
+
+    // hour blocks
+    const palette = ['#FF6B6B','#FF9F43','#FECA57','#4FCB6B','#22C3E6','#4D7CFE','#9B6BF0','#FF6FB5','#2DD4BF','#F97316','#A3E635','#EC4899'];
+    const hourNum = h12;
+    const hourBlocks = [];
+    for (let i=1; i<=hourNum; i++){
+      hourBlocks.push({ n:i, color:palette[(i-1)%palette.length], isFace: i===hourNum });
+    }
+
+    // period
+    const periodIcon = this.state.isPM ? '🌙' : '☀️';
+    const periodCN = this.state.isPM ? '下午' : '上午';
+    const periodEN = this.state.isPM ? 'PM' : 'AM';
+
+    // tabs
+    const isFree = this.state.mode === 'free';
+    const tabOn = 'border:none; cursor:pointer; font-family:inherit; font-size:17px; font-weight:800; padding:9px 18px; border-radius:999px; background:#fff; color:#FF7A3D; box-shadow:0 3px 8px rgba(255,140,80,.3);';
+    const tabOff = 'border:none; cursor:pointer; font-family:inherit; font-size:17px; font-weight:800; padding:9px 18px; border-radius:999px; background:transparent; color:#C7A998;';
+
+    // quiz
+    const isQuiz = this.state.mode === 'quiz';
+    const tt = this.fmtTime(this.state.target);
+    const targetCN = tt.h12 + ':' + tt.mm;
+    const targetDigital = '';
+    const quizMsgColor = this.state.quizOk ? '#1FA85B' : '#E07A9B';
+
+    const levelDots = [1,2,3].map((lv) => ({
+      icon: lv <= this.state.level ? '⭐' : '☆',
+      bg: lv === this.state.level ? '#FFE0EC' : '#F4EEF1',
+      shadow: lv === this.state.level ? '0 0 0 2px #FF7AAB inset' : 'none',
+      onClick: () => this.setLevel(lv),
+    }));
+
+    return {
+      clockNums,
+      hourHandStyle, minuteHandStyle, digital,
+      sentenceCN, sentenceEN,
+      hourNum, hourBlocks,
+      periodIcon, periodCN, periodEN, togglePeriod: this.togglePeriod,
+      freeTabStyle: isFree ? tabOn : tabOff,
+      quizTabStyle: isQuiz ? tabOn : tabOff,
+      goFree: this.goFree, goQuiz: this.goQuiz,
+      isQuiz, targetCN, targetDigital, levelDots,
+      quizMsg: this.state.quizMsg, quizMsgColor, stars: this.state.stars,
+      checkQuiz: this.checkQuiz, newQuiz: this.newQuiz,
+      clockRef: this.clockRef, onDown: this.onDown, onMove: this.onMove, onUp: this.onUp,
+      hourUp: this.hourUp, hourDown: this.hourDown, minUp: this.minUp, minDown: this.minDown,
+      resetClock: this.resetClock,
+    };
+  }
+}
+</script>
+</body>
+</html>
