@@ -14,9 +14,14 @@
   <style>
     *{ box-sizing:border-box; }
     html,body{ margin:0; padding:0; }
+    .clock-wrap{ width:360px; height:360px; }
+    .clock-face{ position:relative; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle at 50% 38%,#FFFFFF 0%,#FFF7F2 70%,#FFF0E8 100%); border:11px solid #FFD9C7; box-shadow:0 16px 30px -14px rgba(180,120,90,.5), inset 0 0 0 6px #FFF6F0; touch-action:none; cursor:grab; user-select:none; }
+    @media (max-width:480px){
+      .clock-wrap{ width:304px; height:304px; }
+      .clock-face{ transform:scale(.8445); transform-origin:top left; }
+    }
     @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
     @keyframes pop{ 0%{ transform:scale(0.4); opacity:0; } 60%{ transform:scale(1.12); } 100%{ transform:scale(1); opacity:1; } }
-    @keyframes blkbounce{ 0%,100%{ transform:translateY(0); } 30%{ transform:translateY(-12px); } 55%{ transform:translateY(0); } 70%{ transform:translateY(-5px); } }
     @keyframes starpop{ 0%{ transform:scale(0) rotate(-40deg); opacity:0; } 70%{ transform:scale(1.3) rotate(8deg); } 100%{ transform:scale(1) rotate(0); opacity:1; } }
   </style>
 </helmet>
@@ -45,16 +50,30 @@
 
       <!-- clock -->
       <div style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:13px;">
-        <div ref="{{ clockRef }}" onPointerDown="{{ onDown }}" onPointerMove="{{ onMove }}" onPointerUp="{{ onUp }}" style="position:relative; width:336px; height:336px; border-radius:50%; background:radial-gradient(circle at 50% 38%,#FFFFFF 0%,#FFF7F2 70%,#FFF0E8 100%); border:11px solid #FFD9C7; box-shadow:0 16px 30px -14px rgba(180,120,90,.5), inset 0 0 0 6px #FFF6F0; touch-action:none; cursor:grab; user-select:none;">
-          <div style="position:absolute; inset:24px; border-radius:50%; border:2px dashed #FFE0D2;"></div>
+        <div class="clock-wrap">
+        <div class="clock-face" ref="{{ clockRef }}" onPointerDown="{{ onDown }}" onPointerMove="{{ onMove }}" onPointerUp="{{ onUp }}">
+          <div style="position:absolute; inset:30px; border-radius:50%; border:2px dashed #FFE0D2;"></div>
+
+          <sc-for list="{{ minuteChars }}" as="char" hint-placeholder-count="12">
+            <div style="position:absolute; left:0; top:0; width:44px; height:52px; transform:translate({{ char.x }}px,{{ char.y }}px); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; z-index:2;">
+              <div style="position:relative; width:38px; height:38px; border-radius:10px; background:{{ char.color }}; box-shadow:inset 0 -5px 0 rgba(0,0,0,.14), 0 3px 7px rgba(120,80,60,.18);">
+                <div style="position:absolute; top:12px; left:9px; width:5px; height:5px; border-radius:50%; background:#3A2A22;"></div>
+                <div style="position:absolute; top:12px; right:9px; width:5px; height:5px; border-radius:50%; background:#3A2A22;"></div>
+                <div style="position:absolute; left:50%; bottom:8px; width:13px; height:6px; margin-left:-6.5px; border-radius:0 0 10px 10px; border:2px solid #3A2A22; border-top:none;"></div>
+                <div style="position:absolute; right:-3px; top:-5px; width:13px; height:13px; border-radius:50%; background:#FFF9D9; border:2px solid {{ char.color }};"></div>
+              </div>
+              <div style="margin-top:-2px; min-width:32px; padding:0 5px; border-radius:999px; background:#fff; color:{{ char.textColor }}; border:2px solid {{ char.color }}; font-size:13px; font-weight:900; line-height:18px; text-align:center; box-shadow:0 2px 4px rgba(120,80,60,.1);">{{ char.label }}</div>
+            </div>
+          </sc-for>
 
           <sc-for list="{{ clockNums }}" as="num" hint-placeholder-count="12">
-            <div style="position:absolute; left:0; top:0; width:46px; height:46px; transform:translate({{ num.x }}px,{{ num.y }}px); display:flex; align-items:center; justify-content:center; font-size:29px; font-weight:800; color:{{ num.color }};">{{ num.label }}</div>
+            <div style="position:absolute; left:0; top:0; width:38px; height:38px; transform:translate({{ num.x }}px,{{ num.y }}px); display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:800; color:{{ num.color }}; z-index:3;">{{ num.label }}</div>
           </sc-for>
 
           <div style="{{ hourHandStyle }}"></div>
           <div style="{{ minuteHandStyle }}"></div>
           <div style="position:absolute; left:50%; top:50%; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%; background:#FFB347; border:4px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.2); z-index:8;"></div>
+        </div>
         </div>
 
         <div style="font-size:15px; font-weight:700; color:#B59A8C; text-align:center;">用手指轉動<span style="color:#3FA7D6;"> 藍色長針 </span>· Drag the blue hand</div>
@@ -110,22 +129,6 @@
         <div style="background:#FFF4DE; border:2px dashed #FFD98A; border-radius:24px; padding:15px 20px;">
           <div style="font-size:23px; font-weight:800; color:#8A6D2F;">{{ sentenceCN }}</div>
           <div style="font-size:15px; font-weight:700; color:#B89A55; margin-top:3px;">{{ sentenceEN }}</div>
-        </div>
-
-        <div style="background:#F3FAFF; border:2px solid #DCEEFB; border-radius:24px; padding:15px 18px;">
-          <div style="font-size:14px; font-weight:800; color:#5B7A93; margin-bottom:10px;">時針指著 <span style="color:#FF7A59; font-size:20px;">{{ hourNum }}</span> ，就是 {{ hourNum }} 塊積木！Hour = {{ hourNum }} blocks</div>
-          <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:flex-end; min-height:40px;">
-            <sc-for list="{{ hourBlocks }}" as="block" hint-placeholder-count="6">
-              <div style="position:relative; width:37px; height:37px; border-radius:9px; background:{{ block.color }}; box-shadow:inset 0 -5px 0 rgba(0,0,0,.16), 0 3px 5px rgba(0,0,0,.12); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:16px;">
-                {{ block.n }}
-                <sc-if value="{{ block.isFace }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute; top:9px; left:8px; width:5px; height:5px; border-radius:50%; background:#3a2a22;"></div>
-                  <div style="position:absolute; top:9px; right:8px; width:5px; height:5px; border-radius:50%; background:#3a2a22;"></div>
-                  <div style="position:absolute; bottom:7px; left:50%; width:12px; height:6px; margin-left:-6px; border-radius:0 0 9px 9px; border:2px solid #3a2a22; border-top:none;"></div>
-                </sc-if>
-              </div>
-            </sc-for>
-          </div>
         </div>
 
       </div>
@@ -289,14 +292,30 @@ class Component extends DCLogic {
     const minAngle = m * 6;
     const hourAngle = (this.norm(this.state.totalMin) / 720) * 360;
 
-    // children are positioned in the padding box (inside the 11px border) = 314px, center 157,157
+    // children are positioned in the padding box (inside the 11px border) = 338px, center 169,169
     const numColors = ['#FF5A5A','#FF8A3D','#F2B705','#4FB85A','#2FA7D6','#5667D8','#9B59D0','#FF6FA5','#18B89C','#EE6C4D','#7CB518','#4357C7'];
     const clockNums = [];
     for (let i=1; i<=12; i++){
       const a = (i*30) * Math.PI/180;
-      const x = 157 + 128*Math.sin(a) - 23;
-      const y = 157 - 128*Math.cos(a) - 23;
+      const x = 169 + 105*Math.sin(a) - 19;
+      const y = 169 - 105*Math.cos(a) - 19;
       clockNums.push({ label:String(i), x:Math.round(x), y:Math.round(y), color:numColors[i-1] });
+    }
+
+    const minutePalette = ['#FF6B6B','#FF9F43','#FECA57','#68D391','#22C3E6','#4D7CFE','#9B6BF0','#FF6FB5','#2DD4BF','#F97316','#A3E635','#EC4899'];
+    const minuteChars = [];
+    for (let i=1; i<=12; i++){
+      const a = (i*30) * Math.PI/180;
+      const color = minutePalette[i-1];
+      const x = 169 + 145*Math.sin(a) - 22;
+      const y = 169 - 145*Math.cos(a) - 26;
+      minuteChars.push({
+        label: String(i * 5 === 60 ? 60 : i * 5),
+        x: Math.round(x),
+        y: Math.round(y),
+        color,
+        textColor: color,
+      });
     }
 
     const handBase = 'position:absolute; left:50%; top:50%; transform-origin:50% 100%; border-radius:8px; z-index:';
@@ -318,13 +337,7 @@ class Component extends DCLogic {
       sentenceEN = "It's " + h12 + ":" + mm + ".";
     }
 
-    // hour blocks
-    const palette = ['#FF6B6B','#FF9F43','#FECA57','#4FCB6B','#22C3E6','#4D7CFE','#9B6BF0','#FF6FB5','#2DD4BF','#F97316','#A3E635','#EC4899'];
     const hourNum = h12;
-    const hourBlocks = [];
-    for (let i=1; i<=hourNum; i++){
-      hourBlocks.push({ n:i, color:palette[(i-1)%palette.length], isFace: i===hourNum });
-    }
 
     // period
     const periodIcon = this.state.isPM ? '🌙' : '☀️';
@@ -351,10 +364,10 @@ class Component extends DCLogic {
     }));
 
     return {
-      clockNums,
+      clockNums, minuteChars,
       hourHandStyle, minuteHandStyle, digital,
       sentenceCN, sentenceEN,
-      hourNum, hourBlocks,
+      hourNum,
       periodIcon, periodCN, periodEN, togglePeriod: this.togglePeriod,
       freeTabStyle: isFree ? tabOn : tabOff,
       quizTabStyle: isQuiz ? tabOn : tabOff,
