@@ -76,7 +76,7 @@
         </div>
         </div>
 
-        <div style="font-size:15px; font-weight:700; color:#B59A8C; text-align:center;">用手指轉動<span style="color:#3FA7D6;"> 藍色長針 </span>· Drag the blue hand</div>
+        <div style="font-size:15px; font-weight:700; color:#B59A8C; text-align:center;">用手指轉動<span style="color:#FF7A59;"> 橘色短針 </span>或<span style="color:#3FA7D6;"> 藍色長針 </span>· Drag either hand</div>
 
         <div style="display:flex; gap:18px; align-items:center; font-size:13px; font-weight:700; color:#7A6A60;">
           <div style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block; width:28px; height:9px; border-radius:6px; background:#FF7A59;"></span>短針·時 Hour</div>
@@ -172,29 +172,58 @@ class Component extends DCLogic {
 
   setTotal(m){ this.setState({ totalMin: this.norm(m) }); }
 
-  // ---- pointer drag on minute hand ----
+  // ---- pointer drag on hour / minute hand ----
   angleFromEvent(e){
     const r = this._clock.getBoundingClientRect();
     const cx = r.left + r.width/2, cy = r.top + r.height/2;
     let ang = Math.atan2(e.clientY - cy, e.clientX - cx) * 180/Math.PI + 90;
     return (ang + 360) % 360; // 0 at top, clockwise
   }
+  angDiff(a, b){
+    let d = Math.abs(a - b) % 360;
+    return d > 180 ? 360 - d : d;
+  }
+  pickDragHand(e){
+    const r = this._clock.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    const dx = e.clientX - cx, dy = e.clientY - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const radius = r.width / 2;
+    // hand lengths relative to outer radius (inner half ≈ 169/180 of outer)
+    const hourLen = radius * (88 / 180);
+    const minLen = radius * (128 / 180);
+    const ang = this.angleFromEvent(e);
+    const { m } = this.fmtTime(this.state.totalMin);
+    const minAngle = m * 6;
+    const hourAngle = (this.norm(this.state.totalMin) / 720) * 360;
+    const nearHour = dist <= hourLen * 1.25 && this.angDiff(ang, hourAngle) <= 22;
+    const nearMin = dist <= minLen * 1.2 && this.angDiff(ang, minAngle) <= 16;
+    if (nearHour && nearMin){
+      // when hands overlap, prefer the short hand nearer the center
+      return dist <= hourLen * 0.95 ? 'hour' : 'minute';
+    }
+    if (nearHour) return 'hour';
+    return 'minute';
+  }
   onDown = (e) => {
     // record where the finger grabbed — do NOT jump the hand to the click point
+    this._dragHand = this.pickDragHand(e);
     this._lastPointerAng = this.angleFromEvent(e);
+    this._accum = 0;
     this.setState({ dragging: true });
     try { e.currentTarget.setPointerCapture(e.pointerId); } catch(_){}
   };
   onMove = (e) => { if(this.state.dragging) this.dragTo(e); };
-  onUp = () => { this.setState({ dragging: false }); };
+  onUp = () => { this._dragHand = null; this.setState({ dragging: false }); };
   dragTo(e){
     const ang = this.angleFromEvent(e);
     // apply only the rotation the finger travelled, in minutes
     let deltaDeg = ang - this._lastPointerAng;
     if (deltaDeg > 180) deltaDeg -= 360;
     if (deltaDeg < -180) deltaDeg += 360;
-    // accumulate fractional rotation, commit only whole minutes (keeps display clean)
-    this._accum = (this._accum || 0) + deltaDeg / 6;
+    // minute hand: 6° per minute · hour hand: 0.5° per minute (360° / 720 min)
+    const degPerMin = this._dragHand === 'hour' ? 0.5 : 6;
+    this._accum = (this._accum || 0) + deltaDeg / degPerMin;
     const step = Math.trunc(this._accum);
     this._lastPointerAng = ang;
     if (step !== 0){
