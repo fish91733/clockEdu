@@ -15,7 +15,9 @@
     *{ box-sizing:border-box; }
     html,body{ margin:0; padding:0; }
     .clock-wrap{ width:360px; height:360px; }
-    .clock-face{ position:relative; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle at 50% 38%,#FFFFFF 0%,#FFF7F2 70%,#FFF0E8 100%); border:11px solid #FFD9C7; box-shadow:0 16px 30px -14px rgba(180,120,90,.5), inset 0 0 0 6px #FFF6F0; touch-action:none; cursor:grab; user-select:none; }
+    .clock-face{ position:relative; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle at 50% 38%,#FFFFFF 0%,#FFF7F2 70%,#FFF0E8 100%); border:11px solid #FFD9C7; box-shadow:0 16px 30px -14px rgba(180,120,90,.5), inset 0 0 0 6px #FFF6F0; touch-action:none; cursor:grab; user-select:none; overflow:hidden; isolation:isolate; }
+    /* Keep the peach rim above markers/hands so sprites cannot punch holes in the ring while rotating. */
+    .clock-face::after{ content:''; position:absolute; inset:-11px; border-radius:50%; border:11px solid #FFD9C7; box-sizing:border-box; pointer-events:none; z-index:30; }
     @media (max-width:480px){
       .clock-wrap{ width:304px; height:304px; }
       .clock-face{ transform:scale(.8445); transform-origin:top left; }
@@ -352,8 +354,8 @@ class Component extends DCLogic {
       const meta = minuteMeta[labelNum];
       const w = meta.w;
       const h = meta.h;
-      const x = 169 + 148*Math.sin(a) - w/2;
-      const y = 169 - 148*Math.cos(a) - h/2;
+      const x = 169 + 140*Math.sin(a) - w/2;
+      const y = 169 - 140*Math.cos(a) - h/2;
       minuteChars.push({
         label: String(labelNum),
         x: Math.round(x),
@@ -364,10 +366,10 @@ class Component extends DCLogic {
       });
     }
 
-    const handBase = 'position:absolute; left:50%; top:50%; transform-origin:50% 100%; border-radius:8px; z-index:';
+    const handBase = 'position:absolute; left:50%; top:50%; transform-origin:50% 100%; border-radius:999px; z-index:';
 
-    const hourHandStyle = handBase + '6; width:14px; height:88px; margin-left:-7px; margin-top:-88px; background:linear-gradient(#FF8A5B,#FF6B3D); box-shadow:0 2px 6px rgba(200,90,50,.4); transform:rotate(' + hourAngle + 'deg);' + (this.state.dragging ? '' : ' transition:transform .25s cubic-bezier(.34,1.56,.64,1);');
-    const minuteHandStyle = handBase + '7; width:11px; height:128px; margin-left:-5.5px; margin-top:-128px; background:linear-gradient(#5BC2EE,#2F9FD6); box-shadow:0 2px 7px rgba(40,120,170,.45); transform:rotate(' + minAngle + 'deg);' + (this.state.dragging ? '' : ' transition:transform .25s cubic-bezier(.34,1.56,.64,1);');
+    const hourHandStyle = handBase + '6; width:14px; height:88px; margin-left:-7px; margin-top:-88px; background:linear-gradient(#FF8A5B,#FF6B3D); box-shadow:0 2px 6px rgba(200,90,50,.4); will-change:transform; transform:rotate(' + hourAngle + 'deg);' + (this.state.dragging ? '' : ' transition:transform .25s cubic-bezier(.34,1.56,.64,1);');
+    const minuteHandStyle = handBase + '7; width:11px; height:128px; margin-left:-5.5px; margin-top:-128px; background:linear-gradient(#5BC2EE,#2F9FD6); box-shadow:0 2px 7px rgba(40,120,170,.45); will-change:transform; transform:rotate(' + minAngle + 'deg);' + (this.state.dragging ? '' : ' transition:transform .25s cubic-bezier(.34,1.56,.64,1);');
 
     // digital
     const digital = h12 + ':' + mm;
