@@ -23,41 +23,9 @@
     @keyframes floaty{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
     @keyframes pop{ 0%{ transform:scale(0.4); opacity:0; } 60%{ transform:scale(1.12); } 100%{ transform:scale(1); opacity:1; } }
     @keyframes starpop{ 0%{ transform:scale(0) rotate(-40deg); opacity:0; } 70%{ transform:scale(1.3) rotate(8deg); } 100%{ transform:scale(1) rotate(0); opacity:1; } }
-    .nb-wrap{ display:flex; flex-direction:column; align-items:center; gap:1px; filter:drop-shadow(0 2px 2px rgba(90,70,60,.18)); }
-    .nb-ling{ font-size:12px; font-weight:900; line-height:1; letter-spacing:-.5px; }
-    .nb-cell{ border-radius:2.5px; box-sizing:border-box; }
-    .nb-cyan{ background:linear-gradient(180deg,#7AF0FA,#1EC8E6); box-shadow:inset 0 -2px 0 rgba(0,60,80,.18), inset 0 1px 0 rgba(255,255,255,.35); }
-    .nb-ten{ background:linear-gradient(180deg,#FFFFFF,#F7F7F7); border:1.5px solid #E53935; box-shadow:inset 0 -1px 0 rgba(0,0,0,.05); }
-    .nb-five{ position:relative; width:16px; height:42px; display:grid; grid-template-rows:repeat(5,1fr); gap:1.5px; }
-    .nb-five .nb-face{ position:relative; }
-    .nb-five .nb-eye{ position:absolute; top:3px; width:3.5px; height:3.5px; border-radius:50%; background:#1E3A8A; }
-    .nb-five .nb-eye.l{ left:2px; }
-    .nb-five .nb-star{ position:absolute; top:0; right:0; font-size:9px; line-height:1; color:#1E3A8A; }
-    .nb-five .nb-mouth{ position:absolute; left:50%; bottom:1px; width:8px; height:3.5px; margin-left:-4px; border-radius:0 0 8px 8px; border:1.5px solid #1E3A8A; border-top:none; }
-    .nb-five .nb-glove{ position:absolute; left:-9px; top:16px; width:9px; height:10px; border-radius:3px 8px 8px 3px; background:#1E3A8A; box-shadow:inset 0 -1px 0 rgba(255,255,255,.25); }
-    .nb-five .nb-leg{ position:absolute; bottom:-5px; width:2.5px; height:5px; border-radius:2px; background:#1E3A8A; }
-    .nb-five .nb-leg.l{ left:3px; }
-    .nb-five .nb-leg.r{ right:3px; }
-    .nb-tenfig{ position:relative; width:26px; height:42px; display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(5,1fr); gap:1.5px; }
-    .nb-tenfig .nb-face{ position:absolute; left:0; right:0; top:0; height:16px; pointer-events:none; z-index:2; }
-    .nb-tenfig .nb-star{ position:absolute; top:1px; font-size:10px; line-height:1; color:#E53935; }
-    .nb-tenfig .nb-star.l{ left:2px; }
-    .nb-tenfig .nb-star.r{ right:2px; }
-    .nb-tenfig .nb-mouth{ position:absolute; left:50%; top:11px; width:10px; height:4px; margin-left:-5px; border-radius:0 0 10px 10px; background:#F472B6; }
-    .nb-tenfig .nb-glove{ position:absolute; width:8px; height:8px; border-radius:50%; background:#fff; border:1.5px solid #E53935; top:18px; z-index:2; }
-    .nb-tenfig .nb-glove.l{ left:-7px; }
-    .nb-tenfig .nb-glove.r{ right:-7px; }
-    .nb-tenfig .nb-leg{ position:absolute; bottom:-5px; width:2.5px; height:5px; border-radius:2px; background:#9B1C1C; }
-    .nb-tenfig .nb-leg.l{ left:7px; }
-    .nb-tenfig .nb-leg.r{ right:7px; }
-    .nb-fifteen{ position:relative; width:34px; height:34px; }
-    .nb-fifteen .nb-step{ position:absolute; display:grid; gap:1.2px; }
-    .nb-fifteen .nb-step .nb-cell{ width:6px; height:6px; }
-    .nb-fifteen .nb-mask{ position:absolute; left:3px; right:1px; top:0; height:8px; border-radius:3px; background:#1E3A8A; z-index:2; box-shadow:0 1px 0 rgba(255,255,255,.25) inset; }
-    .nb-fifteen .nb-mask:before,.nb-fifteen .nb-mask:after{ content:''; position:absolute; top:2px; width:3px; height:3px; border-radius:50%; background:#fff; }
-    .nb-fifteen .nb-mask:before{ left:7px; }
-    .nb-fifteen .nb-mask:after{ right:7px; }
-    .nb-fifteen .nb-mouth{ position:absolute; left:50%; top:11px; width:9px; height:3.5px; margin-left:-4.5px; border-radius:0 0 9px 9px; background:#F472B6; z-index:2; }
+    .nb-mark{ display:flex; flex-direction:column; align-items:center; gap:1px; filter:drop-shadow(0 2px 2px rgba(90,70,60,.16)); pointer-events:none; }
+    .nb-mark img{ height:44px; width:auto; max-width:48px; object-fit:contain; display:block; }
+    .nb-mark .nb-ling{ font-size:12px; font-weight:900; line-height:1; letter-spacing:-.3px; }
   </style>
 </helmet>
 
@@ -90,80 +58,11 @@
           <div style="position:absolute; inset:30px; border-radius:50%; border:2px dashed #FFE0D2;"></div>
 
           <sc-for list="{{ minuteChars }}" as="char" hint-placeholder-count="12">
-            <div style="position:absolute; left:0; top:0; width:{{ char.w }}px; height:{{ char.h }}px; transform:translate({{ char.x }}px,{{ char.y }}px); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; z-index:2;">
-              <sc-if value="{{ char.isFive }}" hint-placeholder-val="{{ false }}">
-                <div class="nb-wrap">
-                  <div class="nb-ling" style="color:#0EA5B7;">5</div>
-                  <div class="nb-five">
-                    <div class="nb-cell nb-cyan nb-face">
-                      <div class="nb-eye l"></div>
-                      <div class="nb-star">★</div>
-                      <div class="nb-mouth"></div>
-                    </div>
-                    <div class="nb-cell nb-cyan"></div>
-                    <div class="nb-cell nb-cyan"></div>
-                    <div class="nb-cell nb-cyan"></div>
-                    <div class="nb-cell nb-cyan"></div>
-                    <div class="nb-glove"></div>
-                    <div class="nb-leg l"></div>
-                    <div class="nb-leg r"></div>
-                  </div>
-                </div>
-              </sc-if>
-              <sc-if value="{{ char.isTen }}" hint-placeholder-val="{{ false }}">
-                <div class="nb-wrap">
-                  <div class="nb-ling" style="color:#E53935;">10</div>
-                  <div class="nb-tenfig">
-                    <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div>
-                    <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div>
-                    <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div>
-                    <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div>
-                    <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div>
-                    <div class="nb-face">
-                      <div class="nb-star l">★</div>
-                      <div class="nb-star r">★</div>
-                      <div class="nb-mouth"></div>
-                    </div>
-                    <div class="nb-glove l"></div>
-                    <div class="nb-glove r"></div>
-                    <div class="nb-leg l"></div>
-                    <div class="nb-leg r"></div>
-                  </div>
-                </div>
-              </sc-if>
-              <sc-if value="{{ char.isFifteen }}" hint-placeholder-val="{{ false }}">
-                <div class="nb-wrap">
-                  <div class="nb-ling" style="color:#1E3A8A;">15</div>
-                  <div class="nb-fifteen">
-                    <div class="nb-step" style="left:22px; top:0; grid-template-columns:1fr;">
-                      <div class="nb-cell nb-cyan"></div>
-                    </div>
-                    <div class="nb-step" style="left:15px; top:7px; grid-template-columns:repeat(2,1fr);">
-                      <div class="nb-cell nb-ten"></div><div class="nb-cell nb-cyan"></div>
-                    </div>
-                    <div class="nb-step" style="left:8px; top:14px; grid-template-columns:repeat(3,1fr);">
-                      <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div><div class="nb-cell nb-cyan"></div>
-                    </div>
-                    <div class="nb-step" style="left:1px; top:21px; grid-template-columns:repeat(4,1fr);">
-                      <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div><div class="nb-cell nb-cyan"></div>
-                    </div>
-                    <div class="nb-step" style="left:-6px; top:28px; grid-template-columns:repeat(5,1fr);">
-                      <div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div><div class="nb-cell nb-ten"></div><div class="nb-cell nb-cyan"></div>
-                    </div>
-                    <div class="nb-mask"></div>
-                    <div class="nb-mouth"></div>
-                  </div>
-                </div>
-              </sc-if>
-              <sc-if value="{{ char.isFace }}" hint-placeholder-val="{{ true }}">
-                <div style="position:relative; width:38px; height:38px; border-radius:10px; background:{{ char.color }}; box-shadow:inset 0 -5px 0 rgba(0,0,0,.14), 0 3px 7px rgba(120,80,60,.18);">
-                  <div style="position:absolute; top:12px; left:9px; width:5px; height:5px; border-radius:50%; background:#3A2A22;"></div>
-                  <div style="position:absolute; top:12px; right:9px; width:5px; height:5px; border-radius:50%; background:#3A2A22;"></div>
-                  <div style="position:absolute; left:50%; bottom:8px; width:13px; height:6px; margin-left:-6.5px; border-radius:0 0 10px 10px; border:2px solid #3A2A22; border-top:none;"></div>
-                  <div style="position:absolute; right:-3px; top:-5px; width:13px; height:13px; border-radius:50%; background:#FFF9D9; border:2px solid {{ char.color }};"></div>
-                </div>
-                <div style="margin-top:-2px; min-width:32px; padding:0 5px; border-radius:999px; background:#fff; color:{{ char.textColor }}; border:2px solid {{ char.color }}; font-size:13px; font-weight:900; line-height:18px; text-align:center; box-shadow:0 2px 4px rgba(120,80,60,.1);">{{ char.label }}</div>
-              </sc-if>
+            <div style="position:absolute; left:0; top:0; width:{{ char.w }}px; height:{{ char.h }}px; transform:translate({{ char.x }}px,{{ char.y }}px); display:flex; align-items:center; justify-content:center; z-index:2;">
+              <div class="nb-mark">
+                <div class="nb-ling" style="color:{{ char.textColor }};">{{ char.label }}</div>
+                <img src="{{ char.src }}" alt="{{ char.label }}" width="48" height="44">
+              </div>
             </div>
           </sc-for>
 
@@ -403,28 +302,36 @@ class Component extends DCLogic {
       clockNums.push({ label:String(i), x:Math.round(x), y:Math.round(y), color:numColors[i-1] });
     }
 
-    const minutePalette = ['#FF6B6B','#FF9F43','#FECA57','#68D391','#22C3E6','#4D7CFE','#9B6BF0','#FF6FB5','#2DD4BF','#F97316','#A3E635','#EC4899'];
+    const minuteMeta = {
+      5:  { color:'#0EA5B7', w:40, h:62 },
+      10: { color:'#E53935', w:44, h:58 },
+      15: { color:'#3B82F6', w:48, h:56 },
+      20: { color:'#F97316', w:48, h:56 },
+      25: { color:'#06B6D4', w:48, h:52 },
+      30: { color:'#EAB308', w:48, h:56 },
+      35: { color:'#CA8A04', w:50, h:48 },
+      40: { color:'#22C55E', w:44, h:54 },
+      45: { color:'#3B82F6', w:48, h:52 },
+      50: { color:'#06B6D4', w:42, h:56 },
+      55: { color:'#8B5CF6', w:48, h:52 },
+      60: { color:'#7C3AED', w:44, h:54 },
+    };
     const minuteChars = [];
     for (let i=1; i<=12; i++){
       const a = (i*30) * Math.PI/180;
       const labelNum = i * 5 === 60 ? 60 : i * 5;
-      const isFive = labelNum === 5;
-      const isTen = labelNum === 10;
-      const isFifteen = labelNum === 15;
-      const isFace = !isFive && !isTen && !isFifteen;
-      const color = isFive ? '#22C3E6' : isTen ? '#E53935' : isFifteen ? '#1E3A8A' : minutePalette[i-1];
-      const w = isFifteen ? 44 : isTen ? 40 : isFive ? 32 : 44;
-      const h = isFifteen ? 52 : (isFive || isTen) ? 62 : 52;
-      const x = 169 + 145*Math.sin(a) - w/2;
-      const y = 169 - 145*Math.cos(a) - h/2;
+      const meta = minuteMeta[labelNum];
+      const w = meta.w;
+      const h = meta.h;
+      const x = 169 + 148*Math.sin(a) - w/2;
+      const y = 169 - 148*Math.cos(a) - h/2;
       minuteChars.push({
         label: String(labelNum),
         x: Math.round(x),
         y: Math.round(y),
         w, h,
-        color,
-        textColor: color,
-        isFive, isTen, isFifteen, isFace,
+        textColor: meta.color,
+        src: './assets/numberblocks/' + labelNum + '.svg',
       });
     }
 
